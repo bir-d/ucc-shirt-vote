@@ -1,0 +1,134 @@
+body {
+    font-family: sans-serif;
+}
+
+.background {
+    position:fixed;
+    width:100%;
+    height:100%;
+    background-image: url(images/clubroom.jpeg);
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    filter: 
+        sepia(10)
+        blur(25px)
+        saturate(.2);
+
+    z-index: -3;
+}
+
+.container {
+    margin: 0px auto 0px auto;
+    text-align: center;
+}
+.shirt-container {
+    position: relative;
+    padding: 10px;
+    margin-top: 60px;
+    height: 500px;
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    display: inline-block;
+}
+.shirt-card {
+    position: absolute;
+    top: 75px;
+    left: 50px;
+    border-radius: 25px;
+    background-color: #fff;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-shadow: 2px 2px 3px #8a8a8a;
+}
+
+.shirt-image {
+    display: inline;
+    width: 100%;
+    height: 300px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.shirt-image img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.shirt-title {
+    font-size: 24px;
+    margin: 0;
+    text-align: center;
+}
+
+.shirt-votes {
+    font-size: 20px;
+    margin: 0;
+    text-align: center;
+}
+
+.shirt-vote-counter {
+    width: 100px;
+    height: 100px;
+    background-color:rgb(255, 0, 0);
+	color:#FFF;
+	border-radius:50px;
+    display: flex;
+    text-align:center;
+    justify-content: center;
+	box-shadow: 2px 2px 3px #8a8a8a;
+    z-index: 1;
+    position: relative;
+}
+
+.padded-multiline { 
+    line-height: 2; 
+    width: 300px;
+    margin: 20px auto;
+  }
+  .padded-multiline span { 
+    color: #fff; 
+    display: inline;
+    padding: 0.45rem;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+.add-vote-btn {
+    background-color: cornflowerblue;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.25s ease;
+}
+
+.add-vote-btn:hover { 
+    opacity: 0.8;
+}
+
+.float{
+	position:fixed;
+	bottom:40px;
+	right:40px;
+	background-color:rgb(255, 87, 87);
+	color:#FFF;
+	border-radius:15px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+    transition:0.2s;
+}
+  
+.float:hover {
+transform: scale(1.1, 1.1)
+}
+
+.float-contents{
+	margin-top: 22px;
+    margin-left: 22px;
+    margin-right: 22px;
+}
