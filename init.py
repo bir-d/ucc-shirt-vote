@@ -34,11 +34,11 @@ COMMIT TRANSACTION;
 
 c.executescript(
     """
-INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (1, 'blue', 'images/blue.jpg');
-INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (2, 'red', 'images/red.jpg');
-INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (3, 'green', 'images/green.jpg');
-INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (4, 'yellow', 'images/yellow.jpg');
-INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (5, 'pink', 'images/pink.jpg');
+INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (NULL, 'blue', 'images/blue.jpg');
+INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (NULL, 'red', 'images/red.jpg');
+INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (NULL, 'green', 'images/green.jpg');
+INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (NULL, 'yellow', 'images/yellow.jpg');
+INSERT INTO shirts (shirt_id, shirt_name, image) VALUES (NULL, 'pink', 'images/pink.jpg');
 """
 )
 
