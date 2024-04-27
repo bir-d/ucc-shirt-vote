@@ -1,4 +1,5 @@
 import os
+import sys
 import sqlite3
 import subprocess
 import json
@@ -7,6 +8,7 @@ import cgi
 from cryptography.fernet import Fernet
 from enum import Enum
 from http import cookies as Cookies
+from http import HTTPStatus
 from typing import Optional
 from typing import Union
 from get_shirts import Shirt
@@ -68,9 +70,7 @@ def decode_token(token: str) -> Credentials:
 # Token + command
 # Credentials + command
 # Returns an error message or `None`
-def verify_input(
-    form: cgi.FieldStorage, cookies: Cookies.SimpleCookie
-) -> Optional[str]:
+def verify_input(form: cgi.FieldStorage, cookies: Cookies.SimpleCookie) -> str | None:
     token = cookies["token"].value
     username = form.getvalue("username")
     password = form.getvalue("password")
@@ -87,7 +87,7 @@ def verify_input(
             return "Token given but no shirt_id to vote for"
         return None
 
-    if not (username is not None and password is not None):
+    if username is None or password is None:
         return "Missing username or password."
 
     return None
@@ -101,7 +101,7 @@ def load_cookies() -> Cookies.SimpleCookie:
     return cookies
 
 
-def vote_for_shirt(user_id: int, shirt_id: int) -> Optional[str]:
+def vote_for_shirt(user_id: int, shirt_id: int) -> str | None:
     cursor = conn.cursor()
     try:
         cursor.executescript(
@@ -114,7 +114,7 @@ INSERT INTO votes (vote_id, user_id, shirt_id) VALUES (NULL, {user_id}, {shirt_i
     return None
 
 
-def get_user_id(username: str) -> Union[int, str]:
+def get_user_id(username: str) -> str | int:
     user_ids = conn.execute(
         f"""
 SELECT user_id FROM users WHERE user_name = {username}
@@ -129,34 +129,44 @@ SELECT user_id FROM users WHERE user_name = {username}
     return int(user_ids[0])
 
 
-conn = sqlite3.connect("db.sqlite")
-input_cookies = load_cookies()
-verify_input(form, input_cookies)
-if type(verify_input) is str:
-    print(verify_input)
-    exit(400)
+def return_status_and_exit(status_code: int):
+    status = HTTPStatus(status_code)
+    print(f"Status: {status_code} {status.phrase}")
+    print()
+    exit()
 
-command = form.getvalue("command")
-match command:
-    case Commands.GET_TOKEN:
-        credentials = Credentials(form.getvalue("username"), form.getvalue("password"))
-        if check_credentials(credentials):
-            cookies: Cookies.SimpleCookie = Cookies.SimpleCookie()
-            cookies.load(encode_token(credentials))
-            # set token
-            exit()
-    case Commands.VOTE:
-        token = input_cookies["token"].value
-        credentials = decode_token(token)
-        if check_credentials(credentials):
-            user_id_or_error = get_user_id(credentials.username)
-            if type(user_id_or_error) is str:
-                print(user_id_or_error)
-                exit(422)
-            shirt_id = form.getvalue("shirt_id")
-            vote_for_shirt(user_id_or_error, shirt_id)
-            exit(201)
-        else:
-            exit(403)
-    case _:
-        exit(400)
+
+if __name__ == "__main__":
+    conn = sqlite3.connect("db.sqlite")
+    input_cookies = load_cookies()
+    input_error = verify_input(form, input_cookies)
+    if isinstance(input_error, str):
+        return_status_and_exit(400)
+
+    command = form.getvalue("command")
+    match command:
+        case Commands.GET_TOKEN:
+            credentials = Credentials(
+                form.getvalue("username"), form.getvalue("password")
+            )
+            if check_credentials(credentials):
+                cookies: Cookies.SimpleCookie = Cookies.SimpleCookie()
+                cookies.load(encode_token(credentials))
+                print(cookies.output)
+                print()
+                exit()
+        case Commands.VOTE:
+            token = input_cookies["token"].value
+            credentials = decode_token(token)
+            if check_credentials(credentials):
+                user_id_or_error = get_user_id(credentials.username)
+                if isinstance(user_id_or_error, int):
+                    shirt_id = form.getvalue("shirt_id")
+                    vote_for_shirt(user_id_or_error, shirt_id)
+                else:
+                    print(user_id_or_error)
+                    return_status_and_exit(422)
+            else:
+                return_status_and_exit(403)
+        case _:
+            return_status_and_exit(400)
