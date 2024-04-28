@@ -8,13 +8,14 @@
     <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
     <script src="https://unpkg.com/htmx.org@1.9.11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="cgi-bin/store.py"></script>
 
     <!-- <script src='main.js'></script> -->
 </head>
 <body>
     <div class="background"></div>
         <a href="#" class="float">
-            <h1 class="float-contents">Vote $X Times!</h1>
+            <h1 class="float-contents">Vote!</h1>
         </a>
         <div class="container">
             <div hx-get="/cgi-bin/get_shirts.py" hx-trigger="load">Loading...</div>
