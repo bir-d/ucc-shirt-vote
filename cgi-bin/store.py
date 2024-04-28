@@ -21,6 +21,7 @@ if __name__ == "__main__":
         f"""
         document.addEventListener('alpine:init', () => {{
             {id_object}
+            Alpine.store('total_votes', 0)
         }})
     """
     )

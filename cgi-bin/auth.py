@@ -13,7 +13,7 @@ from typing import Optional
 from typing import Union
 from get_shirts import Shirt
 
-ENCRYPTION_TOKEN = "changeMe"
+ENCRYPTION_TOKEN = b"yNUBAgH7l8M9kXDvcjB301TJEBlQ97bzoFWDeoSKlBU="
 fernet = Fernet(ENCRYPTION_TOKEN)
 form = cgi.FieldStorage()
 
@@ -32,22 +32,29 @@ class Credentials:
         self.password = password
 
 
+# https://stackoverflow.com/a/14981125
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
 def check_credentials(credentials: Credentials) -> bool:
-    process = subprocess.run(
-        [
-            r"ldapsearch",
-            r"-x",
-            r"-H",
-            r"ldaps://ad.ucc.gu.uwa.edu.au/",
-            r"-D",
-            f'"cn={credentials.username},cn=Users,dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
-            f"-w {credentials.password}",
-            r"-b",
-            r'"dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
-            f'"(cn={credentials.username})"',
-        ]
-    )
-    return process.returncode == 0
+    # process = subprocess.run(
+    #     [
+    #         r"ldapsearch",
+    #         r"-x",
+    #         r"-H",
+    #         r"ldaps://ad.ucc.gu.uwa.edu.au/",
+    #         r"-D",
+    #         f'"cn={credentials.username},cn=Users,dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
+    #         f"-w {credentials.password}",
+    #         r"-b",
+    #         r'"dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
+    #         f'"(cn={credentials.username})"',
+    #     ]
+    # )
+    # return process.returncode == 0
+    eprint(f"la la la im checking {credentials.username} and {credentials.password}")
+    return False
 
 
 def encode_token(credentials: Credentials) -> str:
@@ -80,7 +87,7 @@ def verify_input(form: cgi.FieldStorage, cookies: Cookies.SimpleCookie) -> str |
     if command is None:
         return "No command."
 
-    if token is not "":
+    if token != "":
         if username is not None or password is not None:
             return "Token and credentials given."
         if shirt_id is None:
