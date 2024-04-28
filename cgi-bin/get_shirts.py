@@ -36,7 +36,7 @@ def get_shirts(c: sqlite3.Cursor) -> list[Shirt]:
 def get_shirt_card(shirt: Shirt) -> str:
     html = f"""
             <div class="shirt-container">
-                <div class="shirt-vote-counter"><h1 class="padded-multiline"><span>0</span></h1></div>
+                <div class="shirt-vote-counter"><h1 class="padded-multiline"><span x-text="id"></span></h1></div>
                 <div class="shirt-card">
                     <div class="shirt-image">
                         <img src="{shirt.image}" alt="$SHIRT1" />
@@ -44,18 +44,34 @@ def get_shirt_card(shirt: Shirt) -> str:
                     <div class="shirt-details">
                         <h2 class="shirt-title">{shirt.name}</h2>
                         <h4 class="shirt-votes">{shirt.votes} votes</h4>
-                        <button class="add-vote-btn">Add Vote</button>
+                        <button class="add-vote-btn" x-on:click="{shirt.id}++">Add Vote</button>
                     </div>
                 </div>
             </div>"""
     return html
 
 
+def get_id_object(ids: list) -> str:
+    obj = "{"
+    for id in ids:
+        obj = obj + f"{id}: 0,"
+    obj = obj + "}"
+    return obj
+
+
 cgitb.enable()
 conn = sqlite3.connect("db.sqlite")
 shirts = get_shirts(conn.cursor())
+id_object = get_id_object([shirt.id for shirt in shirts])
 
 print("Content-Type: text/html")
 print()
+print(
+    f"""
+<div class="all-shirts" x-data="{id_object}">
+      """
+)
 for shirt in sorted(shirts, key=lambda shirt: shirt.votes):
     print(get_shirt_card(shirt))
+
+print("</div>")
