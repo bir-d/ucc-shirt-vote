@@ -111,16 +111,27 @@ body {
     opacity: 0.8;
 }
 
+.no-hover-float{
+	position:fixed;
+	bottom:40px;
+	right:40px;
+	color:#FFF;
+	border-radius:15px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+    z-index: 999999;
+}
+
 .float{
 	position:fixed;
 	bottom:40px;
 	right:40px;
-	background-color:rgb(255, 87, 87);
 	color:#FFF;
 	border-radius:15px;
 	text-align:center;
 	box-shadow: 2px 2px 3px #999;
     transition:0.2s;
+    z-index: 999999;
 }
   
 .float:hover {
@@ -131,4 +142,9 @@ transform: scale(1.1, 1.1)
 	margin-top: 22px;
     margin-left: 22px;
     margin-right: 22px;
+}
+
+form.htmx-request {
+    opacity: .5;
+    transition: opacity 300ms linear;
 }
