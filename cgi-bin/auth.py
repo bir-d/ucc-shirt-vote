@@ -54,7 +54,7 @@ def check_credentials(credentials: Credentials) -> bool:
     # )
     # return process.returncode == 0
     eprint(f"la la la im checking {credentials.username} and {credentials.password}")
-    return False
+    return True
 
 
 def encode_token(credentials: Credentials) -> str:

@@ -44,7 +44,8 @@ def get_shirt_card(shirt: Shirt) -> str:
                     <div class="shirt-details">
                         <h2 class="shirt-title">{shirt.name}</h2>
                         <h4 class="shirt-votes">{shirt.votes} votes</h4>
-                        <button class="add-vote-btn" @click="$store.shirt_votes[{shirt.id}] += 1; $store.total_votes += 1">Add Vote</button>
+                        <button class="add-vote-btn" @click="$store.shirt_votes[{shirt.id}] -= 1; $store.total_votes -= 1">+</button>
+                        <button class="add-vote-btn" @click="$store.shirt_votes[{shirt.id}] += 1; $store.total_votes += 1">+</button>
                     </div>
                 </div>
             </div>"""
