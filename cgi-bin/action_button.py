@@ -15,6 +15,7 @@ def get_login_button() -> str:
 def get_login_form(error: str | None) -> str:
     form = """<a class="no-hover-float"">"""
     form += '<form class="float-contents" hx-get="/cgi-bin/action_button.py">'
+    form += "<h3>You should login:</h3>"
     if error is not None:
         form += f"<span>{error}</span><br><br>"
     form += """
@@ -29,9 +30,12 @@ def get_login_form(error: str | None) -> str:
     return form
 
 
-def get_vote_button() -> str:
-    button = """<a class="float">"""
-    button += """<h1 class="float-contents">Use </h1><h1 class="float-contents" x-text="$store.total_votes"></h1><h1 class="float-contents"> votes!</h1>"""
+def get_vote_button(username: str) -> str:
+    button = """<a class="float" style="background-color:rgb(87, 255, 163);">"""
+    button += """<div class="float-contents">"""
+    button += f"""<h4>Hi {username}!</h4><h4>You have X votes left.</h4>"""
+    button += """<h1>Use </h1><h1 x-text="$store.total_votes"></h1><h1> votes!</h1>"""
+    button += """</div>"""
     button += """</a>"""
     return button
 
@@ -66,7 +70,7 @@ if __name__ == "__main__":
     if token is not None:
         credentials = auth.decode_token(token.value)
         if auth.check_credentials(credentials):
-            print_http(get_vote_button())
+            print_http(get_vote_button(credentials.username))
             exit()
     else:
         username = form.getvalue("username")
@@ -78,7 +82,7 @@ if __name__ == "__main__":
                 token_cookie: Cookies.SimpleCookie = Cookies.SimpleCookie()
                 token_cookie["token"] = auth.encode_token(credentials)
                 print(token_cookie.output())
-                print_http(get_vote_button())
+                print_http(get_vote_button(credentials.username))
                 exit()
             print_http(get_login_form("Invalid username or password."))
             exit()
