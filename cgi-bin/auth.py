@@ -15,7 +15,7 @@ from get_shirts import Shirt
 
 ENCRYPTION_TOKEN = b"yNUBAgH7l8M9kXDvcjB301TJEBlQ97bzoFWDeoSKlBU="
 fernet = Fernet(ENCRYPTION_TOKEN)
-form = cgi.FieldStorage()
+# form = cgi.FieldStorage()
 
 
 class Commands(Enum):
@@ -124,16 +124,35 @@ INSERT INTO votes (vote_id, user_id, shirt_id) VALUES (NULL, {user_id}, {shirt_i
 def get_user_id(username: str) -> str | int:
     user_ids = conn.execute(
         f"""
-SELECT user_id FROM users WHERE user_name = {username}
-"""
+SELECT user_id FROM users WHERE user_name = ?;
+""",
+        (username,),
     ).fetchall()
 
-    if user_ids is None:
+    if len(user_ids) == 0:
         return f"No user_id found for username {username}"
     if len(user_ids) > 1:
         return f"Multiple user_id's found for username {username}"
 
-    return int(user_ids[0])
+    return int(user_ids[0][0])
+
+
+def add_user_if_not_exists(username: str):
+    exists = conn.execute(
+        f"""SELECT EXISTS(SELECT * FROM users WHERE user_name = ?)""",
+        (username,),
+    ).fetchall()[0][0]
+    if exists == 0:
+        add_user(username)
+
+
+def add_user(username: str):
+    conn.execute(
+        f"""
+INSERT INTO users (user_id, user_name) VALUES (NULL, '{username}');
+"""
+    )
+    conn.commit()
 
 
 def return_status_and_exit(status_code: int):
@@ -143,37 +162,38 @@ def return_status_and_exit(status_code: int):
     exit()
 
 
-if __name__ == "__main__":
-    conn = sqlite3.connect("db.sqlite")
-    input_cookies = load_cookies()
-    input_error = verify_input(form, input_cookies)
-    if isinstance(input_error, str):
-        return_status_and_exit(400)
+conn = sqlite3.connect("db.sqlite")
+# if __name__ == "__main__":
 
-    command = form.getvalue("command")
-    match command:
-        case Commands.GET_TOKEN:
-            credentials = Credentials(
-                form.getvalue("username"), form.getvalue("password")
-            )
-            if check_credentials(credentials):
-                cookies: Cookies.SimpleCookie = Cookies.SimpleCookie()
-                cookies.load(encode_token(credentials))
-                print(cookies.output)
-                print()
-                exit()
-        case Commands.VOTE:
-            token = input_cookies["token"].value
-            credentials = decode_token(token)
-            if check_credentials(credentials):
-                user_id_or_error = get_user_id(credentials.username)
-                if isinstance(user_id_or_error, int):
-                    shirt_id = form.getvalue("shirt_id")
-                    vote_for_shirt(user_id_or_error, shirt_id)
-                else:
-                    print(user_id_or_error)
-                    return_status_and_exit(422)
-            else:
-                return_status_and_exit(403)
-        case _:
-            return_status_and_exit(400)
+# input_cookies = load_cookies()
+# input_error = verify_input(form, input_cookies)
+# # if isinstance(input_error, str):
+#     return_status_and_exit(400)
+
+# command = form.getvalue("command")
+# match command:
+#     case Commands.GET_TOKEN:
+#         credentials = Credentials(
+#             form.getvalue("username"), form.getvalue("password")
+#         )
+#         if check_credentials(credentials):
+#             cookies: Cookies.SimpleCookie = Cookies.SimpleCookie()
+#             cookies.load(encode_token(credentials))
+#             print(cookies.output)
+#             print()
+#             exit()
+#     case Commands.VOTE:
+#         token = input_cookies["token"].value
+#         credentials = decode_token(token)
+#         if check_credentials(credentials):
+#             user_id_or_error = get_user_id(credentials.username)
+#             if isinstance(user_id_or_error, int):
+#                 shirt_id = form.getvalue("shirt_id")
+#                 vote_for_shirt(user_id_or_error, shirt_id)
+#             else:
+#                 print(user_id_or_error)
+#                 return_status_and_exit(422)
+#         else:
+#             return_status_and_exit(403)
+#     case _:
+#         return_status_and_exit(400)

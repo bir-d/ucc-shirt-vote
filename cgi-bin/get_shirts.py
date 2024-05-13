@@ -33,6 +33,23 @@ def get_shirts(c: sqlite3.Cursor) -> list[Shirt]:
     return shirts
 
 
+def get_shirt(c: sqlite3.Cursor, id_to_search: int) -> Shirt:
+    shirt = c.execute(
+        "SELECT * FROM shirts WHERE shirt_id = ?;", (id_to_search,)
+    ).fetchone()
+    shirt_id = shirt[0]
+    shirt_name = shirt[1]
+    shirt_image = shirt[2]
+    shirt_votes = c.execute(
+        f"""
+            SELECT COUNT(*)
+            FROM votes
+            WHERE shirt_id = {id_to_search};
+            """
+    ).fetchone()[0]
+    return Shirt(shirt_id, shirt_name, shirt_image, shirt_votes)
+
+
 def get_shirt_card(shirt: Shirt) -> str:
     html = f"""
             <div class="shirt-container">
@@ -73,7 +90,7 @@ if __name__ == "__main__":
     <div class="all-shirts">
         """
     )
-    for shirt in sorted(shirts, key=lambda shirt: shirt.votes):
+    for shirt in sorted(shirts, key=lambda shirt: shirt.votes, reverse=True):
         print(get_shirt_card(shirt))
 
     print("</div>")

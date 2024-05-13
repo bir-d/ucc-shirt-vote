@@ -3,6 +3,7 @@ from http import cookies as Cookies
 import os
 import sys
 import auth
+import cokers
 
 
 def get_login_button() -> str:
@@ -30,10 +31,15 @@ def get_login_form(error: str | None) -> str:
     return form
 
 
-def get_vote_button(username: str) -> str:
+def get_vote_button(username: str, message: str | None = None) -> str:
+    votes_remaining = cokers.get_votes_remaining(username)
     button = """<a class="float" style="background-color:rgb(87, 255, 163);">"""
-    button += """<div class="float-contents">"""
-    button += f"""<h4>Hi {username}!</h4><h4>You have X votes left.</h4>"""
+    button += """<div hx-post='/cgi-bin/democracy.py' hx-vals='js:{votes: Alpine.store("shirt_votes")}' class="float-contents">"""
+    if message is not None:
+        button += f"<h2>{message}</h2><br><br>"
+    button += (
+        f"""<h4>Hi {username}!</h4><h4>You have {votes_remaining} votes left.</h4>"""
+    )
     button += """<h1>Use </h1><h1 x-text="$store.total_votes"></h1><h1> votes!</h1>"""
     button += """</div>"""
     button += """</a>"""
