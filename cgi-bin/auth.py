@@ -38,23 +38,21 @@ def eprint(*args, **kwargs):
 
 
 def check_credentials(credentials: Credentials) -> bool:
-    # process = subprocess.run(
-    #     [
-    #         r"ldapsearch",
-    #         r"-x",
-    #         r"-H",
-    #         r"ldaps://ad.ucc.gu.uwa.edu.au/",
-    #         r"-D",
-    #         f'"cn={credentials.username},cn=Users,dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
-    #         f"-w {credentials.password}",
-    #         r"-b",
-    #         r'"dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
-    #         f'"(cn={credentials.username})"',
-    #     ]
-    # )
-    # return process.returncode == 0
-    eprint(f"la la la im checking {credentials.username} and {credentials.password}")
-    return True
+    process = subprocess.run(
+        [
+            r"ldapsearch",
+            r"-x",
+            r"-H",
+            r"ldaps://ad.ucc.gu.uwa.edu.au/",
+            r"-D",
+            f'"cn={credentials.username},cn=Users,dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
+            f"-w {credentials.password}",
+            r"-b",
+            r'"dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
+            f'"(cn={credentials.username})"',
+        ]
+    )
+    return process.returncode == 0
 
 
 def encode_token(credentials: Credentials) -> str:

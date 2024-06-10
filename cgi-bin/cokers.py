@@ -50,6 +50,3 @@ def get_votes_remaining(username: str) -> int:
     if isinstance(id, int):
         return get_potential_credits(username) - get_spent_votes(id)
     return 0
-
-
-print(get_votes_remaining("bird"))
