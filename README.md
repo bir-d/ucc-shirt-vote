@@ -13,3 +13,7 @@
 * AlpineJS
 * Python (cgi)
 * SQLite
+
+## Screenshots
+![image](https://github.com/bir-d/ucc-shirt-vote/assets/20701908/a8211511-dbee-4969-a79c-fd76920268fe)
+![image](https://github.com/bir-d/ucc-shirt-vote/assets/20701908/18cb137b-bdcf-409d-a829-3f58dec9d7f1)
