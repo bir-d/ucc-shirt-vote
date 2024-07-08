@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import cgi
 import cgitb
 import sqlite3
@@ -56,13 +57,19 @@ def get_shirt_card(shirt: Shirt) -> str:
                 <div class="shirt-vote-counter"><h1 class="padded-multiline"><span>+</span><span x-text="$store.shirt_votes[{shirt.id}]"></span></h1></div>
                 <div class="shirt-card">
                     <div class="shirt-image">
-                        <img src="{shirt.image}" alt="$SHIRT1" />
+                        <a href="https://demuccracy.ucc.asn.au/{shirt.image}" target="_blank">
+                            <img src="{shirt.image}" alt="$SHIRT1" />
+                        </a>
                     </div>
                     <div class="shirt-details">
-                        <h2 class="shirt-title">{shirt.name}</h2>
-                        <h4 class="shirt-votes">{shirt.votes} votes</h4>
-                        <button class="add-vote-btn" @click="if ($store.shirt_votes[{shirt.id}] > 0) {{$store.shirt_votes[{shirt.id}] -= 1; $store.total_votes -= 1}}">-</button>
-                        <button class="add-vote-btn" @click="$store.shirt_votes[{shirt.id}] += 1; $store.total_votes += 1">+</button>
+                        <h1 class="shirt-title">{shirt.name}</h2>
+                        <h4 class="shirt-votes">{shirt.votes} total votes</h4>
+                        <button class="add-vote-btn" @click="if ($store.shirt_votes[{shirt.id}] >= 10) {{$store.shirt_votes[{shirt.id}] -= 10; $store.total_votes -= 10}}">-10</button>
+                        <button class="add-vote-btn" @click="if ($store.shirt_votes[{shirt.id}] > 0) {{$store.shirt_votes[{shirt.id}] -= 1; $store.total_votes -= 1}}">-1</button>
+                        <button class="add-vote-btn" @click="$store.shirt_votes[{shirt.id}] += 1; $store.total_votes += 1">+1</button>
+                        <button class="add-vote-btn" @click="$store.shirt_votes[{shirt.id}] += 10; $store.total_votes += 10">+10</button>
+                        <button class="add-vote-btn" @click="$store.total_votes -= $store.shirt_votes[{shirt.id}]; $store.shirt_votes[{shirt.id}] = 0">RESET</button>
+                        <button class="add-vote-btn" onclick="window.open('https://demuccracy.ucc.asn.au/{shirt.image}', '_blank'); return false;">Open image</button>
                     </div>
                 </div>
             </div>"""
@@ -78,7 +85,7 @@ def get_id_object(ids: list) -> str:
 
 
 if __name__ == "__main__":
-    cgitb.enable()
+#    cgitb.enable()
     conn = sqlite3.connect("db.sqlite")
     shirts = get_shirts(conn.cursor())
     id_object = get_id_object([shirt.id for shirt in shirts])

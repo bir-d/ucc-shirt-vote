@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import datetime
 import shlex
 import sqlite3
@@ -5,7 +6,7 @@ import auth
 
 
 def check_valid_date(line: str) -> bool:
-    valid_date = datetime.date(2024, 2, 1)
+    valid_date = datetime.date(2024, 4, 24) #y m d
     line_date = line[:6].split()
     return (
         valid_date
@@ -16,13 +17,13 @@ def check_valid_date(line: str) -> bool:
 
 
 def get_potential_credits(username: str) -> int:
-    with open(r"\Users\bird\Documents\cokelog", "r") as cokelog:
+    with open(r"/resource/cokelog", "r") as cokelog:
         dispense_lines = filter(
             lambda line: "merlo odispense2: dispense" in line, cokelog
         )
         lines_in_date = filter(check_valid_date, dispense_lines)
-        lines_from_user = filter(lambda line: username in line, lines_in_date)
-        balances = map(lambda line: int(shlex.split(line)[13][:-1]), lines_from_user)
+        lines_from_user = filter(lambda line: username in line or username.lower() in line, lines_in_date)
+        balances = list(map(lambda line: int(shlex.split(line)[13][:-1]), lines_from_user))
         credits = sum(balances) // 100
 
         return credits
@@ -38,15 +39,17 @@ SELECT COUNT(*) FROM votes WHERE user_id = {user_id};
 
 
 def get_spent_votes_un(username: str) -> int:
+    username = username.lower()
     id = auth.get_user_id(username)
-    print(id)
     if isinstance(id, int):
         return get_spent_votes(id)
     return 99999
 
 
 def get_votes_remaining(username: str) -> int:
+    username = username.lower()
     id = auth.get_user_id(username)
     if isinstance(id, int):
         return get_potential_credits(username) - get_spent_votes(id)
     return 0
+

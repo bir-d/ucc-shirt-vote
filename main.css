@@ -89,7 +89,7 @@ body {
     margin: 20px auto;
   }
   .padded-multiline span { 
-    color: #fff; 
+    color: #FFF; 
     display: inline;
     padding: 0.45rem;
     box-decoration-break: clone;
@@ -98,7 +98,7 @@ body {
 
 .add-vote-btn {
     background-color: cornflowerblue;
-    color: #fff;
+    color: #FFF;
     border: none;
     padding: 10px 20px;
     margin: 10px;
@@ -115,7 +115,7 @@ body {
 	position:fixed;
 	bottom:40px;
 	right:40px;
-	color:#FFF;
+	color:#000;
 	border-radius:15px;
 	text-align:center;
 	box-shadow: 2px 2px 3px #999;
@@ -126,7 +126,7 @@ body {
 	position:fixed;
 	bottom:40px;
 	right:40px;
-	color:#FFF;
+	color:#000;
 	border-radius:15px;
 	text-align:center;
 	box-shadow: 2px 2px 3px #999;

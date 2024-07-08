@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import cgi
 from http import cookies as Cookies
 import os
@@ -14,8 +15,8 @@ def get_login_button() -> str:
 
 
 def get_login_form(error: str | None) -> str:
-    form = """<a class="no-hover-float"">"""
-    form += '<form class="float-contents" hx-get="/cgi-bin/action_button.py">'
+    form = """<a class="no-hover-float" style="background-color:rgb(87,255,163);" >"""
+    form += '<form class="float-contents" style="background-color:rgb(87,255,163);" hx-get="/cgi-bin/action_button.py">'
     form += "<h3>You should login:</h3>"
     if error is not None:
         form += f"<span>{error}</span><br><br>"
@@ -25,6 +26,9 @@ def get_login_form(error: str | None) -> str:
 <label>password: </label><br>
 <input type=password name=password></input><br><br>
 <input type="submit" value="Submit">
+<h4></h4>
+<div class="loader htmx-indicator"></div>
+
 """
     form += "</form>"
     form += """</a>"""
@@ -33,16 +37,27 @@ def get_login_form(error: str | None) -> str:
 
 def get_vote_button(username: str, message: str | None = None) -> str:
     votes_remaining = cokers.get_votes_remaining(username)
-    button = """<a class="float" style="background-color:rgb(87, 255, 163);">"""
-    button += """<div hx-post='/cgi-bin/democracy.py' hx-vals='js:{votes: Alpine.store("shirt_votes")}' class="float-contents">"""
-    if message is not None:
-        button += f"<h2>{message}</h2><br><br>"
-    button += (
-        f"""<h4>Hi {username}!</h4><h4>You have {votes_remaining} votes left.</h4>"""
-    )
-    button += """<h1>Use </h1><h1 x-text="$store.total_votes"></h1><h1> votes!</h1>"""
-    button += """</div>"""
-    button += """</a>"""
+    if votes_remaining > 0:
+        button = """<a class="float" style="background-color:rgb(87, 255, 163);">"""
+        button += """<div hx-post='/cgi-bin/democracy.py' hx-swap="none" hx-vals='js:{votes: Alpine.store("shirt_votes")}' class="float-contents" class="vote-button">"""
+        if message is not None:
+            button += f"<h2>{message}</h2><br><br>"
+        button += (
+            f"""<h4>Hi {username}!</h4><h4>You have {votes_remaining} votes left.</h4>"""
+        )
+        button += """<h1>Use </h1><h1 x-text="$store.total_votes"></h1><h1> votes!</h1>"""
+        button += """<div class="loader htmx-indicator"></div>"""
+        button += """</a>"""
+    else:
+        button = """<a class="float" style="background-color: rgb(255 87 87);">"""
+        button += """<div class="float-contents">"""
+        button += """<h4>You have no votes left :(</h4>"""
+        button += """<h4>Spend some money in UCC to get more!</h4>"""
+        button += """<h4>(Votes refresh every minute)</h4>"""
+        button += """<button onClick="window.location.reload();">Refresh Page</button>"""
+        button += """<h4></h4>"""
+        button += """</div>"""
+        button += """</a>"""
     return button
 
 
@@ -85,6 +100,7 @@ if __name__ == "__main__":
         if username is not None and password is not None:
             credentials = auth.Credentials(username, password)
             if auth.check_credentials(credentials):
+                auth.add_user_if_not_exists(username)
                 token_cookie: Cookies.SimpleCookie = Cookies.SimpleCookie()
                 token_cookie["token"] = auth.encode_token(credentials)
                 print(token_cookie.output())

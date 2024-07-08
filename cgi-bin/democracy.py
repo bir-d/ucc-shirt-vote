@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import cgi
 import sqlite3
 import sys
@@ -33,7 +34,14 @@ if token is not None:
             )
             print("Content-Type: text/html")
             print()
-            print("""<div class="loader"></div>""")
+            exit()
+
+        if sum(json.values()) == 0:
+            print(
+                """HX-Trigger: {"reload": "You didn't vote for anything... Reloading!"}"""
+            )
+            print("Content-Type: text/html")
+            print()
             exit()
 
         for shirt_id in json.keys():
@@ -45,22 +53,13 @@ if token is not None:
             uid = int(auth.get_user_id(credentials.username))
             for i in range(vote):
                 auth.vote_for_shirt(uid, shirt.id)
-            print("""HX-Trigger: {"reload": "Vote successful. Reloading!"}""")
-            print("Content-Type: text/html")
-            print()
-            print(action_button.get_vote_button(credentials.username))
-            exit()
-        print(
-            """HX-Trigger: {"reload": "You didn't vote for anything... Reloading!"}"""
-        )
+        print("""HX-Trigger: {"reload": "Vote successful. Reloading!"}""")
         print("Content-Type: text/html")
         print()
-        print("""<div class="loader"></div>""")
         exit()
 print(
     """HX-Trigger: {"reload": "Your request is malformed. Try clearing your cache and cookies. Reloading!"}"""
 )
 print("Content-Type: text/html")
 print()
-print("""<div class="loader"></div>""")
 exit()

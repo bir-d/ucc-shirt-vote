@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os
 import sys
 import sqlite3
@@ -28,7 +29,7 @@ class Credentials:
     password: str
 
     def __init__(self, username: str, password: str):
-        self.username = username
+        self.username = username.lower()
         self.password = password
 
 
@@ -38,21 +39,19 @@ def eprint(*args, **kwargs):
 
 
 def check_credentials(credentials: Credentials) -> bool:
-    process = subprocess.run(
-        [
-            r"ldapsearch",
-            r"-x",
-            r"-H",
-            r"ldaps://ad.ucc.gu.uwa.edu.au/",
-            r"-D",
-            f'"cn={credentials.username},cn=Users,dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
-            f"-w {credentials.password}",
-            r"-b",
-            r'"dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au"',
-            f'"(cn={credentials.username})"',
-        ]
-    )
-    return process.returncode == 0
+    args= ['ldapsearch',
+    '-x',
+    '-H',
+    'ldaps://ad.ucc.gu.uwa.edu.au/',
+    '-D',
+    f'cn={credentials.username},cn=Users,dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au',
+    '-w',
+    f'{credentials.password}',
+    '-b',
+    'dc=ad,dc=ucc,dc=gu,dc=uwa,dc=edu,dc=au',
+    f'cn={credentials.username}']
+    process = subprocess.call(args, shell=False, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    return process == 0
 
 
 def encode_token(credentials: Credentials) -> str:
@@ -107,19 +106,21 @@ def load_cookies() -> Cookies.SimpleCookie:
 
 
 def vote_for_shirt(user_id: int, shirt_id: int) -> str | None:
+    eprint(f"Vote for {shirt_id} from {user_id}")
     cursor = conn.cursor()
     try:
         cursor.executescript(
             f"""
-INSERT INTO votes (vote_id, user_id, shirt_id) VALUES (NULL, {user_id}, {shirt_id})
+INSERT INTO votes (vote_id, user_id, shirt_id) VALUES (NULL, {user_id}, {shirt_id});
 """
         )
     except sqlite3.Error as e:
-        return str(e)
+        eprint(e)
     return None
 
 
 def get_user_id(username: str) -> str | int:
+    username = username.lower()
     user_ids = conn.execute(
         f"""
 SELECT user_id FROM users WHERE user_name = ?;
@@ -136,6 +137,7 @@ SELECT user_id FROM users WHERE user_name = ?;
 
 
 def add_user_if_not_exists(username: str):
+    username = username.lower()
     exists = conn.execute(
         f"""SELECT EXISTS(SELECT * FROM users WHERE user_name = ?)""",
         (username,),
@@ -145,6 +147,7 @@ def add_user_if_not_exists(username: str):
 
 
 def add_user(username: str):
+    username = username.lower()
     conn.execute(
         f"""
 INSERT INTO users (user_id, user_name) VALUES (NULL, '{username}');
@@ -195,3 +198,4 @@ conn = sqlite3.connect("db.sqlite")
 #             return_status_and_exit(403)
 #     case _:
 #         return_status_and_exit(400)
+add_user_if_not_exists("bird")
